@@ -12,7 +12,7 @@ const Sprint = require('./models/sprint')
 
 const port = 8090
 
-var mongoDB = 'mongodb+srv://Damaris:12345@cluster0.gdp4f.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+var mongoDB = 'mongodb+srv://cata:cata@cluster0.wcbqw.mongodb.net/first?retryWrites=true&w=majority'
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 
 var db = mongoose.connection;
@@ -32,19 +32,30 @@ app.get('/sprint', async (req, res) =>{
     res.json(record)
 })
 
-app.get('/project/kanban', async (req, res) =>{
-    const record= await Project.find({'type':'kanban'}).exec()
-    console.log(record)
-    res.json(record)
-})
-app.get('/project/scrum', async (req, res) =>{
-    const record= await Project.find({'type':'scrum'}).exec()
-    res.json(record)
-})
-app.get('/project/bugtracking', async (req, res) =>{
 
-    const record= await Project.find({'type':'bug tracking '}).exec()
+app.post('/sprint/projectid', async (req, res) =>{
+    // const record= await Project.find({'type':req.query.type}).exec()
+    const record= await Sprint.find({'project_id':req.body.id})
+    console.log(record)
+
     res.json(record)
+})
+
+app.post('/allsprints', async (req, res) =>{
+    let result = [];
+    console.log(req.body)
+    if (req.body.length) {
+        for (let index = 0; index < req.body.length; index++) {
+            if(req.body[index]!==''){
+                const issue = await Sprint.find({ '_id': req.body[index] })
+                result.push(issue[0]);
+            }else{
+                result.push({name:"Backlog"});
+            }
+            
+        }
+    }
+    res.json(result)
 })
 
 app.listen(port, () => {
