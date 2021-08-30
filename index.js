@@ -20,30 +20,30 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.post('/sprint', async (req, res) => {
     let newSprint = req.body
-    var addSprint=new Sprint({name:newSprint.name,description:newSprint.description,project_id:newSprint.project_id})
+    var addSprint = new Sprint(
+        {
+            name: newSprint.name,
+            description: newSprint.description,
+            project_id: newSprint.project_id,
+            closed: false
+        })
     await Sprint.create(addSprint)
     res.send(newSprint)
 })
 
 app.get('/sprint', async (req, res) =>{
-    // const record= await Project.find({'type':req.query.type}).exec()
-    const record= await Sprint.find({})
-    console.log(record)
+    const record= req.query.id ? await Sprint.find({'project_id':req.query.id}) : await Sprint.find({})
     res.json(record)
 })
-
 
 app.post('/sprint/projectid', async (req, res) =>{
     // const record= await Project.find({'type':req.query.type}).exec()
     const record= await Sprint.find({'project_id':req.body.id})
-    console.log(record)
-
     res.json(record)
 })
 
 app.post('/allsprints', async (req, res) =>{
     let result = [];
-    console.log(req.body)
     if (req.body.length) {
         for (let index = 0; index < req.body.length; index++) {
             if(req.body[index]!==''){
@@ -57,6 +57,16 @@ app.post('/allsprints', async (req, res) =>{
     }
     res.json(result)
 })
+app.put('/sprint', async (req, res) => {
+    const newObject = req.body
+    var id_=req.params.id
+    const filter={_id:req.body._id}
+    let update_= await Sprint.findOneAndUpdate(filter, newObject, {
+        new: true,
+        upsert: true 
+      });
+    res.send(update_)
+ })
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
