@@ -5,6 +5,10 @@ const model = mongoose.Schema({
         type: String,
         required: true
     },
+    closed:{
+        type: Boolean,
+        default: 'false'
+    },
     description: {
         type: String,
         required: true
